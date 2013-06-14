@@ -1,24 +1,27 @@
-
 /*
-Ensemble de petite fonctions utiles
+Some usefull functions
 */
-int kezako_ascii(char c)
+
+#include <string.h>
+#include <stdio.h>
+
+int kezako_ascii(char c) //  ASCII
 {
-    if(c == ' ') return 5; // espace
+    if(c == ' ') return 5; // space
     if(c == '.') return 5;
     if(c == ',') return 5;
     if(c<0) return 4;
-    if(c<32) return -1; // non imprimable
+    if(c<32) return -1; // unprintable
     if(c<48) return 0; // !"'&#.....
-    if(c<58) return 1; // chiffres
+    if(c<58) return 1; // numeral
     if(c<65) return 4;
-    if(c<91) return 2;// majuscules
+    if(c<91) return 2;// capital letter
     if(c<97) return 4;
-    if(c<123) return 3; // minuscules
+    if(c<123) return 3; // small letter
     return 4;
 }
-int mini_text(char *s)
-{ // met toutes les lettres a-z et A-Z en minuscules!
+int mini_text(char *s) // capital letter to small letter
+{
     char *pt;
 
     pt = s;
@@ -29,8 +32,8 @@ int mini_text(char *s)
      }
     return 1;
 }
-/* Elimine le \n residuel en fin de ligne, et met \0 */
-void Ctexte (char *tamp)
+
+void Ctexte (char *tamp)  // removed residual \n and put the \0 to the end of the string
 {
         char *ptr;
         ptr=tamp;
@@ -39,8 +42,8 @@ void Ctexte (char *tamp)
             ptr++;
           }
 }
-void Ctexte2(char *s)
-{// pareil en plus tout terrain : stop aux caracteres non imprimables.
+void Ctexte2(char *s) // same function for more complexe case. Removed unprintable letter.
+{
     char *ps;
     int encore = 1;
     int a,b;
@@ -53,16 +56,14 @@ void Ctexte2(char *s)
        else
         { b = *ps;
           *ps = 0;
-          //printf("(%d) (%c) ->%s\n");
-          //system("PAUSE");
         }
      }
     *ps = 0;
 }
 
 
-int copie_string(char *source, char *dest)
-{ /* etre sur que source <= dest */
+int copie_string(char *source, char *dest)  // compare source and dest (if source is <= than dest)
+{
         char *src,*dst;
         src=source;
         dst=dest;
@@ -77,22 +78,9 @@ int long_string(char *ligne)
         while((*ptr)&&(*ptr!='\n')) ptr++;
         return ptr - ligne;
 }
-double lire_num(char *seq)
-{// equivat a sscanf = sep \t
-        char *p;
-        char c[26],*pc;
 
-        p=seq;
-        pc = c;
-        if(!(*p)) return 0.0;
-        while(*p == '\t') p++;
-        while((*p)&&(*p != '\t')) *pc++ = *p++;
-        *pc = 0;
-        copie_string(p,seq);
-        return atof(c);
-}
-char* lire_seq(char *entree,char *sortie, char sep)
-{ // ex : lire_seq("df,dfz,zezg,zgzga",s,',');
+char* lire_seq(char *entree,char *sortie, char sep) // read a sequence without the separator
+{
     char *pe,*ps;
 
     pe = entree;
