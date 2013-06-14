@@ -1,0 +1,36 @@
+=======
+ KEIKO 
+=======
+
+KEIKO allows to place objects in a 3D space according to a physical model using attraction and
+repulsions forces. It has been developped to manage large networks of genes where attraction and 
+repulsion are identified to positive and negative correlation between genes observed on a large
+panel of transriptomic microarray results. 
+
+This is the final KEIKO version that has been developped by Jerôme Hennetin in 2008 and 
+used in the following publication:
+
+Hennetin J, Pehkonen P, Bellis M
+Construction and use of gene expression covariation matrix
+BMC Bioinformatics (2009) 10: 240
+http://www.biomedcentral.com/1471-2105/10/214
+
+In 2013, the project is carried on with the help of Romain Retureau, to simplify the code 
+by eliminating visualisation by Open GL and to add some comments. The aim is to keep a 
+simple console application which delivers the final position of object in 3D. The visualisation
+will be then provided by another piece of software.
+
+
+%vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv%
+%                          c) Michel Bellis                                                %
+%                          michel.bellis@crbm.cnrs.fr                                      %
+%            Affiliation:  CNRS (Centre National de la Recherche Scientifique - France)    %
+%  Bioinformatic Project:  ARRAYMATIC => http://code.google.com/p/arraymatic               %
+%        Code Repository:  GITHUB => http://github.com/mbellis                             %
+%          Personal Page:  http://bns.crbm.cnrs.fr                                         %
+%vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv%
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
+%  THIS CODE IS DISTRIBUTED UNDER THE CeCILL LICENSE, WHICH IS COMPATIBLE WITH       %
+%  THE GNU GENERAL PUBLIC LICENCE AND IN ACCORDANCE WITH THE EUROPEAN LEGISLATION.   %
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!%
