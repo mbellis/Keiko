@@ -1,8 +1,7 @@
 /*
 
-    RAM gerant les fichiers *.csv des puces Affymetrix.
-    probeset[0] -> definitions des champs
-    probeset[1]-> le premier probeset de la puce!!!!!!!
+    probeset[0] -> field definition
+    probeset[1]-> first probset of the microarray
 
 
 */
@@ -50,7 +49,7 @@ int RAM_Puce::lister_probe()
 {
     FILE *pf;
     char tamp[6096];
-    int i,j;
+    int i;
 
     pf = fopen("h:/MlpTest/Mus11K/debug.txt","w");
     if(!pf) return 0;
@@ -62,7 +61,7 @@ int RAM_Puce::lister_probe()
     fclose(pf);
     return 1;
 }
-/**********************************************/
+
 int PROBESET::fixer(char *s)
 { // preparation en ***\t*****\t**...\0
     char *pt,*ps;
@@ -95,7 +94,6 @@ int PROBESET::lire_d(int num, char *s)
     char tamp[4096],*pt;
     int i;
 
-    //pt = tamp;
     pt = lire_seq(d,tamp,'\t');
     for(i = 0; i< num; i++)
       pt = lire_seq(pt,tamp,'\t');
@@ -117,4 +115,3 @@ int PROBESET::tester_probeset(char *s)
     return 0;
 }
 
-/**********************************************/

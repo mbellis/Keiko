@@ -72,6 +72,7 @@ class REZO
     int initier();
     int agreger();
     int sauver();
+    int auto_sauver(int j);
     int charger();
     REZO_ELEM* transferer(int a);
     int preparer();

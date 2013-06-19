@@ -6,13 +6,10 @@
 
 
 
-    Lien Inter : d ====> force * d; : lineaire
-
-
+    Link Inter : d ====> force * d; : linear
 
 */
 #include <time.h>
-
 #include "zegeometrik.h"
 
 #define Rayon_sphere 0.4
@@ -20,6 +17,9 @@
 #define Horizon 6
 #define Dseuil 3000
 
+
+char coordNulBuff[128];
+int coordNul;
 
 
 FORCE Soleil, Repulsion, Inter;
@@ -35,7 +35,6 @@ int FORCE::ouvrir(char *s)
     n_va = 0;
     while(fgets(tamp,64,pf))
      { Ctexte(tamp);
-       //printf("%s %f\n",tamp,atof(tamp));
        va[n_va] = atof(tamp);
        n_va++;
      }
@@ -51,21 +50,25 @@ int FORCE::fixer_fact(float a)
 float FORCE::lire(int a)
 {   return va[a];
 }
+
+
 float FORCE::lire_rep(float a)
-{   // type repulsion : a de 0 à 1!
+{   // repulsion type : a from 0 to 1!
 
     if(a>Horizon) return 0.0;
     p_va = (int)(a*f_fact);
     return va[p_va];
 }
+
 float FORCE::lire_sun(float a)
-{ // type solaire : a de 0 à 10000!
+{ // solar type : a from 0 to 10000!
     p_va = (int)(a*10);
-    if(p_va>10000) return a; // energie enorme!!!!
+    if(p_va>10000) return a; // important energy !!
     return va[p_va];
 }
-/*********************************/
-int UNIVERS::initer(REZO *pr)
+
+
+int UNIVERS::initer(REZO *pr)  // initiate the network
 {
     REZO_ELEM *po;
     int i;
@@ -78,26 +81,29 @@ int UNIVERS::initer(REZO *pr)
        po = prezo->transferer(n_planete);
      }
 
-    srand((unsigned int) time(NULL));
+
+    srand((unsigned int) time(NULL));                 // calculate random coordinates (if 0 as console var.
     for(i=0;i<n_planete;i++)
      { neo[i][0] = (float)((rand() % 900) - 450)/4.0;
        neo[i][1] = (float)((rand() % 900) - 450)/4.0;
        neo[i][2] = (float)((rand() % 900) - 450)/4.0;
      }
-    /********************************/
-    lien_seuil = 9000;
+
+
+
+    lien_seuil = 9000;                  // always begin with 9000 in the threshold link.
     prezo->desactiver_all_links();
     prezo->activer_seuil_sup(lien_seuil);
     prezo->activer_seuil_inf(Dseuil-lien_seuil);
 
     for(i=0;i<n_planete;i++)
       force[i][0] = force[i][1] = force[i][2] = 0.0;
+
     copier_arrivee();
 
     if(!Soleil.ouvrir("soleil.txt")) return 0;
     if(!Repulsion.ouvrir("repulsion.txt")) return 0;
     Repulsion.fixer_fact(10000/(float)(Horizon));
-    //if(Inter.ouvrir("inter.txt")) nop();
 
 
     msoleil = 10;
@@ -127,7 +133,6 @@ int UNIVERS::initer2(REZO *pr)
 
     if(!Soleil.ouvrir("soleil.txt")) return 0;
     if(!Repulsion.ouvrir("repulsion.txt")) return 0;
-    //if(Inter.ouvrir("inter.txt")) nop();
 
 
     lien_seuil = 9000;
@@ -160,8 +165,14 @@ int UNIVERS::copier_arrivee()
 {
     int i;
 
+    coordNul = atoi(coordNulBuff);
+
     for(i=0;i<n_planete;i++)
-     { planete[i]->fixer_coord(neo[i][0],neo[i][1],neo[i][2]);
+     {
+        if (coordNul == 0)
+        {
+            planete[i]->fixer_coord(neo[i][0],neo[i][1],neo[i][2]);
+        }
        depart[i][0] = neo[i][0];
        depart[i][1] = neo[i][1];
        depart[i][2] = neo[i][2];
@@ -331,52 +342,8 @@ float UNIVERS::modifier_pas(float a)
     npas *= a;
     return pas;
 }
-int UNIVERS::do_cycle(int a)
-{
-    int encore;
-    // position de depart!
-    pas = 10.0;
-    npas = -10.0;
-    copier_depart(); // deja fait en initier()
-    prep_parsec();
-    energie[1] = calc_force();
-    copier_arrivee();
 
-    /*****************************/
-   // aff_grafik();
-    /*****************************/
-     energie[0] = energie[1];
 
-    // mouvement !
-    etap = 0;
-    encore = 1;
-    while(encore)
-     { encore = 0;
-       Sleep(500);
-       etap++;
-       bouger();
-       prep_parsec();
-       energie[1] = calc_force();
-       //printf("> %d (%4.1f):Nouvelle Energie = %8.3f \t depuis %8.3f\n",etap,pas,energie[1]/1000,energie[0]/1000);
-       if(energie[1] < energie[0])
-        { copier_arrivee();
-          /*****************************/
-          // aff_grafik();
-          /*****************************/
-          energie[0] = energie[1];
-          encore = 1;
-        }
-       else
-        { pas = pas/2.0;
-          npas = npas/2.0;
-          encore = 1;
-        }
-       if(etap>550) encore = 0;
-       if(pas<0.01) encore = 0;
-     }
-    return 1;
-}
-/*********************************************/
 double UNIVERS::calc_energie()
 {
     double a,b;
@@ -442,20 +409,22 @@ int UNIVERS::marcher(int sub_etap)
     float ls;
     int i;
 
-
     if(!sub_etap) return 0; // pas d'action!!!!
+
 
     if(!etap) // initialisation
      { if(sub_etap == 1) // prepare parsec
         { prep_parsec();
           energie[0] = energie[1] = 0.0;
           sub_etap++;
-          /************/
+
+
           prezo->activer_seuil_sup(lien_seuil);
           neg_lien_seuil = Dseuil-lien_seuil;
           if(neg_lien_seuil > -1300) neg_lien_seuil = -1300;
           prezo->activer_seuil_inf(neg_lien_seuil);
-          /*************/
+
+
           return sub_etap;
         }
        if(sub_etap == 2) // calcule depuis soleil
@@ -560,7 +529,6 @@ int UNIVERS::marcher(int sub_etap)
            energie[0] = energie[1];
            energie[1] = 0.0;
            etap++;
-           //return sub_etap;
          }
 
       }
@@ -573,7 +541,6 @@ int UNIVERS::marcher(int sub_etap)
     }
 
      sub_etap = 1;
-     //if(etap > 200) sub_etap = 0;
      return sub_etap;
 }
 

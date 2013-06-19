@@ -1,6 +1,6 @@
 /*
-Creation et presentation du reseau de probeset
-membre de glutrezo
+
+Creating and representing the probset network
 
 */
 
@@ -8,7 +8,7 @@ membre de glutrezo
 
 char Rezoin[128];
 char Rezoout[128];
-char Rezoprobindex[128];
+char fileName[128];
 
 
 
@@ -183,7 +183,7 @@ int REZO_ELEM::lire_type()
 int REZO_ELEM::sauver(FILE *pf)
 {
 
-    fprintf(pf,"%6.3f\t%6.3f\t%6.3f\n",x,y,z);
+    fprintf(pf,"%d\t%6.3f\t%6.3f\t%6.3f\n",id, x,y,z);   // save id probset and coordinates in an output file
 
     return 1;
 }
@@ -197,7 +197,7 @@ REZO_LIEN * REZO_ELEM::aj_lien(REZO_LIEN *pdef,REZO_ELEM *pe,int fa,int aa)
        if(aa) pl->activer();
        return pl;
      }
-    // nouveau Lien!
+    // new link !
     pl = pdef;
     pl->creer(pe,fa);
     if(!aa)pl->desactiver();
@@ -290,20 +290,40 @@ int REZO::sauver()
     FILE *pf;
     int i;
 
+    pf = fopen(Rezoout,"w");  // open the output file created from the console var.
 
-
-    pf = fopen(Rezoout,"w");
-
-    if(!pf) return 0;
+    if(!pf) return 0; // if doesn't open, close the program.
 
     for(i=0;i<n_elem;i++)
-      Elem[i].sauver(pf);
+      Elem[i].sauver(pf);  // save coordinates
 
-    fclose(pf);
-    //sauver_pos();
+    fclose(pf); // close the file.
     return 1;
 }
-int REZO::charger()
+
+int REZO::auto_sauver(int j)
+{
+    FILE *pf;
+    int i;
+    char fname[128];
+
+    sprintf(fname,"autosave/%s_asav%d.txt", fileName, j);  // Save the name of the autosaved files into a buffer
+
+    pf = fopen(fname,"w");  // Open (and create) the autosaved file
+
+    if(!pf) return 0;  // If it doen't work, stop the function
+
+    for(i=0;i<n_elem;i++)
+      Elem[i].sauver(pf);  // Function to save coordinates.
+
+    fclose(pf); // close the file
+
+    cout << "Coord. autosaved as \"autosaved/" << fileName <<"_asav"<< j << ".txt \n\n" << endl;
+    return 1;
+}
+
+
+int REZO::charger()   // open the input file, read the data and attribute them to var.
 {
     FILE *pf;
     char tamp[84];
@@ -315,7 +335,7 @@ int REZO::charger()
     pf = fopen(Rezoin,"r");
     if(!pf) return 0;
 
-    // securité predefinition des planetes!!
+    // pre-define the planet : more secure
     for(i=0;i<MaxProbe;i++) Elem[i].fixer(i);
     n_elem = n_lien = k_lien = 0;
 
@@ -338,7 +358,6 @@ int REZO::charger()
               az = atof(pt);
            }
           Elem[n_elem-1].fixer_coord(ax,ay,az);
-          //Elem[n_elem-1].ecrire();
           k_lien = 0;
         }
        else

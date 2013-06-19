@@ -28,7 +28,6 @@ class UNIVERS
     double force[MaxProbe][3];
     double forceI[MaxProbe][3];
     float mouv[MaxProbe][3];
-    float camera[3];
     float pas,npas;
     float msoleil,mrepulsion,minter;
     int n_planete,etap,sub_etap,memo;
@@ -41,7 +40,6 @@ class UNIVERS
     int caractere[MaxProbe];
     float couleur[100][3];
     public:
-    int idcamera;
     double energie[2]; // 0 depart  // 1 arrivee
     int initer(REZO *pr);
     int initer2(REZO *pr);
@@ -53,9 +51,6 @@ class UNIVERS
     double calc_inter(int a);
     double calc_force();
     int bouger();
-    int affichage();
-    int aff_select();
-    int aff_grafik();
     int act_marcher(int a);
     int activer_lien(int a);
     int marcher(int sub_etap);
@@ -66,8 +61,6 @@ class UNIVERS
     int prep_selection();
     int act_selection();
     int neo_lien_seuil(int a);
-    int default_couleur();
-    int load_couleur();
 };
 
 
