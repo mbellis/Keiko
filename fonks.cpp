@@ -6,8 +6,23 @@ Some usefull functions
 #include <stdio.h>
 
 
-int mini_text(char *s) // capital letter to small letter
+int kezako_ascii(char c)
 {
+    if(c == ' ') return 5; // espace
+    if(c == '.') return 5;
+    if(c == ',') return 5;
+    if(c<0) return 4;
+    if(c<32) return -1; // non imprimable
+    if(c<48) return 0; // !"'&#.....
+    if(c<58) return 1; // chiffres
+    if(c<65) return 4;
+    if(c<91) return 2;// majuscules
+    if(c<97) return 4;
+    if(c<123) return 3; // minuscules
+    return 4;
+}
+int mini_text(char *s)
+{ // met toutes les lettres a-z et A-Z en minuscules!
     char *pt;
 
     pt = s;
@@ -18,8 +33,8 @@ int mini_text(char *s) // capital letter to small letter
      }
     return 1;
 }
-
-void Ctexte (char *tamp)  // removed residual \n and put the \0 to the end of the string
+/* Elimine le \n residuel en fin de ligne, et met \0 */
+void Ctexte (char *tamp)
 {
         char *ptr;
         ptr=tamp;
@@ -28,10 +43,29 @@ void Ctexte (char *tamp)  // removed residual \n and put the \0 to the end of th
             ptr++;
           }
 }
+void Ctexte2(char *s)
+{// pareil en plus tout terrain : stop aux caracteres non imprimables.
+    char *ps;
+    int a,b;
+
+    ps = s;
+    while(*ps)
+     { a = kezako_ascii(*ps);
+       if(a>0) ps++;
+       else if(!a) *ps = '_';
+       else
+        { b = *ps;
+          *ps = 0;
+          //printf("(%d) (%c) ->%s\n");
+          //system("PAUSE");
+        }
+     }
+    *ps = 0;
+}
 
 
-int copie_string(char *source, char *dest)  // compare source and dest (if source is <= than dest)
-{
+int copie_string(char *source, char *dest)
+{ /* etre sur que source <= dest */
         char *src,*dst;
         src=source;
         dst=dest;
@@ -46,9 +80,22 @@ int long_string(char *ligne)
         while((*ptr)&&(*ptr!='\n')) ptr++;
         return ptr - ligne;
 }
+double lire_num(char *seq)
+{// equivat a sscanf = sep \t
+        char *p;
+        char c[26],*pc;
 
-char* lire_seq(char *entree,char *sortie, char sep) // read a sequence without the separator
-{
+        p=seq;
+        pc = c;
+        if(!(*p)) return 0.0;
+        while(*p == '\t') p++;
+        while((*p)&&(*p != '\t')) *pc++ = *p++;
+        *pc = 0;
+        copie_string(p,seq);
+        return atof(c);
+}
+char* lire_seq(char *entree,char *sortie, char sep)
+{ // ex : lire_seq("df,dfz,zezg,zgzga",s,',');
     char *pe,*ps;
 
     pe = entree;
@@ -62,7 +109,7 @@ char* lire_seq(char *entree,char *sortie, char sep) // read a sequence without t
 int nop()
 { return 1;
 }
-int chercher_string(char *s, char *phrase)  // search in a string
+int chercher_string(char *s, char *phrase)
 {
     char *ps,*ph;
     int LS,ls,lh;
@@ -71,27 +118,51 @@ int chercher_string(char *s, char *phrase)  // search in a string
     LS = long_string(ps);
     ph = phrase;
     lh = long_string(ph);
-
-    if(LS < 1) return 0;
+    //printf("%d>%s\n%d>%s\n",LS,ps,lh,ph);
+    if(LS < 1) return 0; // Paglop si 0 ou negatif.
     if(LS > lh) return 0;
 
+    //printf("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK\n");
     ls = LS;
     while(*ph)
     { while((*ph)&&( *ph != *ps)) ph++;
+      //printf(">%s\n>%s\n",ps,ph);
       while((*ph)&&(*ph == *ps)&&(--ls))
        { ph++;
          ps++;
        }
-      if(!ls) return 1; // MATCH !
+      if(!ls) return 1; // MATCH !!!!!!!!!!!!!!!!!
       ps = s;
-      ls = LS; // if not, do another loop
+      ls = LS; // sinon encore un tour de plus...
     }
 
     return 0;
 }
-
-int aj_string(char *s1,char *s2) // concatenate s1 with s2
+int get_email(char *s,char *em)
 {
+    char *ps,*pem;
+    char sav;
+
+
+    pem = s;
+    while( (*pem)&&(*pem != '@') ) pem++;
+    if(!*pem) return 0; // pas d'adresse Email.
+
+    ps = pem;
+    while( (ps>s)&&(*ps >32) ) ps--;
+    if(ps>s) ps++;
+
+    while(*pem>32) pem++;
+    sav = *pem;
+    *pem = 0;
+    copie_string(ps,em);
+    *pem = sav;
+
+
+    return 1;
+}
+int aj_string(char *s1,char *s2)
+{ // ajoute s1 à s2
     char *ps;
 
     ps = s2;
@@ -99,4 +170,109 @@ int aj_string(char *s1,char *s2) // concatenate s1 with s2
     copie_string(s1,ps);
     return 1;
 }
+int aj_string_notab(char *s1,char *s2)
+{ // ajoute s1 à s2
+    char *ps,*pt;
 
+    ps = s2;
+    while(*ps) ps++;
+    pt = s1;
+    while(*pt)
+     { if(*pt == '\t') *pt = ' ';
+       *ps++ = *pt++;
+     }
+    *ps = 0;
+
+    return 1;
+}
+int aj_string2(char *s1,char *s2)
+{ // ajoute s1 à s2
+    char *ps;
+
+    printf(">%s\n%s\n",s1,s2);
+    ps = s2;
+    while(*ps)
+     { ps++;
+       //printf(">%s\t%d\n",ps,*ps);
+       //system("PAUSE");
+     }
+
+    //copie_string(s1,ps);
+    printf(">%s\n",s2);
+       system("PAUSE");
+
+    return 1;
+}
+int fixe_majuscule(char *s)
+{
+    char *p;
+
+    p=s;
+    while(*p)
+     { if(kezako_ascii(*p) == 3) // minuscules
+         *p -= 32; // passe en majuscules
+       p++;
+     }
+     return 1;
+}
+int fec_fasta(FILE *pf,char *s,int a)
+{
+        char *pt;
+        int j;
+
+    pt = s;
+        j=0;
+        while(*pt)
+         { fprintf(pf,"%c",*pt++);
+           if(++j > a)
+            { fprintf(pf,"\n");
+              j=0;
+            }
+         }
+        if(j) fprintf(pf,"\n");
+
+        return 1;
+}
+int bubble_crois(int *val,int *index,int taille)
+{ // ordre decroissant
+    int i,j,encore;
+
+
+    encore = 1;
+    while(encore)
+     { encore = 0;
+       for(i=1;i<taille;i++)
+        { if(val[i-1] > val[i])
+            { j = val[i-1];
+              val[i-1] = val[i];
+              val[i] = j;
+              j = index[i-1];
+              index[i-1] = index[i];
+              index[i] = j;
+              encore = 1;
+            }
+        }
+     }
+    return 1;
+}
+int bubble_decrois(int *val,int *index,int taille)
+{ // ordre decroissant
+    int i,j,encore;
+
+    encore = 1;
+    while(encore)
+     { encore = 0;
+       for(i=1;i<taille;i++)
+        { if(val[i-1] < val[i])
+            { j = val[i-1];
+              val[i-1] = val[i];
+              val[i] = j;
+              j = index[i-1];
+              index[i-1] = index[i];
+              index[i] = j;
+              encore = 1;
+            }
+        }
+     }
+    return 1;
+}

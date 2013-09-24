@@ -81,28 +81,31 @@ int UNIVERS::initer(REZO *pr)  // initiate the network
        po = prezo->transferer(n_planete);
      }
 
+    if (coordFlag){
+        srand((unsigned int) time(NULL));                 // calculate random coordinates (if coordFlag ~= 0).
+        for(i=0;i<n_planete;i++)
+         { neo[i][0] = (float)((rand() % 900) - 450)/4.0;
+           neo[i][1] = (float)((rand() % 900) - 450)/4.0;
+           neo[i][2] = (float)((rand() % 900) - 450)/4.0;
+         }
+    }
 
-    srand((unsigned int) time(NULL));                 // calculate random coordinates (if 0 as console var.
-    for(i=0;i<n_planete;i++)
-     { neo[i][0] = (float)((rand() % 900) - 450)/4.0;
-       neo[i][1] = (float)((rand() % 900) - 450)/4.0;
-       neo[i][2] = (float)((rand() % 900) - 450)/4.0;
-     }
 
 
-
-    lien_seuil = 9000;                  // always begin with 9000 in the threshold link.
+    //lien_seuil = 9000;
+    lien_seuil=aSeuil;                 // always begin with 9000 in the threshold link.
     prezo->desactiver_all_links();
     prezo->activer_seuil_sup(lien_seuil);
     prezo->activer_seuil_inf(Dseuil-lien_seuil);
+
 
     for(i=0;i<n_planete;i++)
       force[i][0] = force[i][1] = force[i][2] = 0.0;
 
     copier_arrivee();
 
-    if(!Soleil.ouvrir("soleil.txt")) return 0;
-    if(!Repulsion.ouvrir("repulsion.txt")) return 0;
+    if(!Soleil.ouvrir((char*) "soleil.txt")) return 0;
+    if(!Repulsion.ouvrir((char*) "repulsion.txt")) return 0;
     Repulsion.fixer_fact(10000/(float)(Horizon));
 
 
@@ -131,14 +134,16 @@ int UNIVERS::initer2(REZO *pr)
     for(i=0;i<n_planete;i++)
       force[i][0] = force[i][1] = force[i][2] = 0.0;
 
-    if(!Soleil.ouvrir("soleil.txt")) return 0;
-    if(!Repulsion.ouvrir("repulsion.txt")) return 0;
+    if(!Soleil.ouvrir((char*) "soleil.txt")) return 0;
+    if(!Repulsion.ouvrir((char*) "repulsion.txt")) return 0;
 
 
-    lien_seuil = 9000;
+    //lien_seuil = 9000;
+    lien_seuil = aSeuil;
     prezo->desactiver_all_links();
     prezo->activer_seuil_sup(lien_seuil);
     prezo->activer_seuil_inf(Dseuil-lien_seuil);
+
 
     copier_depart();
     copier_arrivee();
@@ -421,7 +426,9 @@ int UNIVERS::marcher(int sub_etap)
 
           prezo->activer_seuil_sup(lien_seuil);
           neg_lien_seuil = Dseuil-lien_seuil;
-          if(neg_lien_seuil > -1300) neg_lien_seuil = -1300;
+
+          //if(neg_lien_seuil > -1300) neg_lien_seuil = -1300;
+          if(neg_lien_seuil > -mSeuil) neg_lien_seuil = -mSeuil;
           prezo->activer_seuil_inf(neg_lien_seuil);
 
 
@@ -520,6 +527,7 @@ int UNIVERS::marcher(int sub_etap)
                  lien_seuil = (int) ls;
                  prezo->activer_seuil_sup(lien_seuil);
                  neg_lien_seuil = Dseuil-lien_seuil;
+
                  if(neg_lien_seuil > -1300) neg_lien_seuil = -1300;
                  prezo->activer_seuil_inf(neg_lien_seuil);
                  pas = 20;
@@ -534,7 +542,7 @@ int UNIVERS::marcher(int sub_etap)
       }
 
 
-    if (lien_seuil < seuilMin)
+    if (lien_seuil < mSeuil)
     {
         sub_etap = 0;
         return sub_etap;
@@ -553,6 +561,7 @@ int UNIVERS::neo_lien_seuil(int a)
     prezo->desactiver_all_links();
     prezo->activer_seuil_sup(lien_seuil);
     prezo->activer_seuil_inf(Dseuil-lien_seuil);
+
     return 1;
 }
 

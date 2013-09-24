@@ -325,26 +325,43 @@ int REZO::auto_sauver(int j)
 
 int REZO::charger()   // open the input file, read the data and attribute them to var.
 {
+    FILE *tf;
+    tf = fopen("control.txt","a");
     FILE *pf;
     char tamp[84];
     char tamp2[24],*pt;
-    int i,j,k,k_lien;
+    int i,j,k,k_lien,m;
     float ax,ay,az;
-
-
     pf = fopen(Rezoin,"r");
     if(!pf) return 0;
+    //recover nb of probesets and nb of links
+    n_elem = n_lien =  0;
+    while(fgets(tamp,84,pf))
+     { Ctexte(tamp);
+       if(tamp[0] == '>'){
+            n_elem++;
+        }
+        else{
+            n_lien++;
+        }
+     }
+     fclose(pf);
+     REZO_LIEN Lien[n_lien];
+     REZO_ELEM Elem[n_elem];
 
     // pre-define the planet : more secure
     for(i=0;i<MaxProbe;i++) Elem[i].fixer(i);
     n_elem = n_lien = k_lien = 0;
 
+    //read file
+    pf = fopen(Rezoin,"r");
     while(fgets(tamp,84,pf))
      { Ctexte(tamp);
        if(tamp[0] == '>')
         { pt = tamp+1;
           pt = lire_seq(pt,tamp2,'\t');
           i = atoi(tamp2);
+          m=i;
           pt = lire_seq(pt,tamp2,'\t');
           j = atoi(tamp2);
           Elem[n_elem++].charger(i,j);
@@ -367,13 +384,25 @@ int REZO::charger()   // open the input file, read the data and attribute them t
           pt = lire_seq(pt,tamp2,'\t');
           j = atoi(tamp2);
           k = atoi(pt);
-          if(k_lien) Lien[n_lien-1].lier(&Lien[n_lien]);
-          else Elem[n_elem-1].fixer_lien(&Lien[n_lien]);
+          if(k_lien){
+              Lien[n_lien-1].lier(&Lien[n_lien]);
+          }
+          else {
+              Elem[n_elem-1].fixer_lien(&Lien[n_lien]);
+          }
           Lien[n_lien++].charger(&Elem[i],j,k);
+          if (n_elem==0){
+            fprintf(tf,"%s: too many links at >%i and:%i\n",Rezoin,m,i);
+            printf("%s: too many links at >%i and:%i\n",Rezoin,m,i);
+            fclose(tf);
+            return 0;
+          }
           k_lien++;
         }
      }
     fclose(pf);
+    fclose(tf);
+    //printf("%i\n",n_elem);
     //charger_pos();
     return 1;
 }
@@ -512,7 +541,7 @@ int REZO::creer_liens_sup()
 }
 int REZO::compter_liens_actifs()
 {
-    REZO_LIEN *pl;
+    //REZO_LIEN *pl;
     int i,j,k;
 
     k = 0;
